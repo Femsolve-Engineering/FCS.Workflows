@@ -57,4 +57,4 @@ jobs:
           target-branch: ${{ inputs.target_branch }}
           config-file: ${{ inputs.config_file }}
           manifest-file: ${{ inputs.manifest_file }}
-          skip-github-pull-request: true     # only create releases
+          skip-github-pull-request: false     # only create releases
