@@ -38,7 +38,7 @@ on:
       delay:
         type: number
         description: delays workflow execution by the given number of seconds
-        default: 0
+        default: 20
 
 jobs:
   release-pr:
