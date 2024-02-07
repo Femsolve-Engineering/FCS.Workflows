@@ -61,5 +61,5 @@ jobs:
           target-branch: ${{ inputs.target_branch }}
           config-file: ${{ inputs.config_file }}
           manifest-file: ${{ inputs.manifest_file }}
-          token: ${{ input.token }}
+          token: ${{ inputs.token }}
           skip-github-pull-request: false     # only create releases
