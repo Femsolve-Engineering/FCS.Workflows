@@ -1,9 +1,14 @@
-# This workflow uses release-please to create a releases and version-bumps:
-#   * creates a semver tag for the current commit
-#   * creates a GitHub release for the tag
-#   * updates release-pr: adds comment with reference to GitHub Release and adds label `autorelease: tagged`
-# 
-# This workflow is NOT configured to create and update release-prs (see release-pr.yml) (although release-please is capable of doing with a singe action). This is a design decision aiming to improve readability by allowing to separate the workflows for release-pr creation and for release/build/push
+# This Workflow creates a new branch with code changes required for a version bump (e.g incremenmt app version in manifest files) as well as a PR to merge these changes to the target branch.
+# The version bump (=change of semantic version number) is automatically determined from commit history at the source ref which triggered the workflow. 
+# Changes are read from conventional commit messages. A release-PR is created only in case "releasable units" have been pushed to git ref.
+# The workflow also creates and updates an auto-generated changelog. The format of the changelog is specified at the config_file. Namely, the config file can be used to specify a mepping between conventional commits and changelog sections. Each conventional commit, which will be written to the changelog, is considered to be a releasable unit and, thus, results in a version bump.
+#
+# The auto-generated Release PR will:
+# - increment the application version at `.release-please-manifest.json`
+# - increment the application version at framework-specific files (e.g. `package.json`, `pyproject.toml`, `go.mod`,...)
+# - update `CHANGELOG.md` and include conventional commit messages
+#
+# This workflow is NOT configured to create releases (see release.yml) (although release-please is capable of doing with a singe action). This is a design decision aiming to improve readability by allowing to separate the workflows for release-pr creation and for release/build/push
 #
 # Limitations:
 #   * release_semver is set only in case a root package (package path: ".") is specified in release-please config file. This workflow needs to be modified in case release-please should be used to release non-root packages (e.g. in a monorepo)
@@ -13,53 +18,47 @@
 # further reading:
 #   * https://github.com/googleapis/release-please
 #   * https://github.com/google-github-actions/release-please-action
-
-
-name: release
+name: release-pr
 
 on:
   workflow_call:
     inputs:
       target_branch:
         type: string
-        description: target branch. Must match target branch for release PRs
+        description: 'target branch for release pull requests'
         default: main
       config_file:
         type: string
-        description: path to release-please config file. Defaults to release-please-config.json
-        default: .release-please-config.json
+        description: 'path to release-please config file'
+        default: release-please-config.json
       manifest_file:
         type: string
-        description: path to release-please manifest file. Defaults to .release-please-manifest.json
+        description: 'path to release-please manifest file'
         default: .release-please-manifest.json
-      token:
-        type: string
-        description: 'GitHub token or PAT for authentication'
-        required: true
-
-    outputs:
-      release_created: 
-        description: true if a release was created by this workflow, false otherwise
-        value: ${{ jobs.release.outputs.release_created }}
-      release_semver:
-        description: Semver number of the release created by this workflow. Empty in case no release was created
-        value: ${{ jobs.release.outputs.release_semver }}
+      delay:
+        type: number
+        description: delays workflow execution by the given number of seconds
+        default: 30
 
 jobs:
-  release:
+  release-pr:
     runs-on: ubuntu-latest
     permissions:
-      contents: write       # writes release and tag
-      pull-requests: write  # reads und updates PR comments and labels
-    outputs:
-      release_created: ${{ steps.release.outputs.release_created }} 
-      release_semver: '${{ steps.release.outputs.major }}.${{ steps.release.outputs.minor }}.${{ steps.release.outputs.patch }}'  # See https://github.com/google-github-actions/release-please-action?tab=readme-ov-file#root-component-outputs
+      contents: write           # the action creates and pushes a new branch for the changes which are introduced with the PR
+      pull-requests: write
     steps:
+
+      # release-please uses the GitHub GraphQL API to check for pending merged pull requests, and to check labels on these PRs.
+      # A race condition might occur in case release-please is concurrently used at another workflow (e.g. release.yml) to merge PRs and to create releases. In this case, duplicate release PRs might get created by this action.
+      # To avoid race conditions a delay is added to make sure `release` runs first to success before trying to create a release PR.cancel-timeout-minutes.
+      # Alternatively, concurrent job execution can be avoided by 
+      - name: delay
+        run: sleep ${{ inputs.delay }}
+
       - uses: google-github-actions/release-please-action@v4
-        id: release
         with:  
+          token: ${{ secrets.GITHUB_TOKEN }}
           target-branch: ${{ inputs.target_branch }}
           config-file: ${{ inputs.config_file }}
           manifest-file: ${{ inputs.manifest_file }}
-          token: ${{ inputs.token }}
-          skip-github-pull-request: false     # only create releases
+          skip-github-release: true     # only create release-PRs and branchess
