@@ -27,11 +27,15 @@ on:
       config_file:
         type: string
         description: path to release-please config file. Defaults to release-please-config.json
-        default: release-please-config.json
+        default: .release-please-config.json
       manifest_file:
         type: string
         description: path to release-please manifest file. Defaults to .release-please-manifest.json
         default: .release-please-manifest.json
+      token:
+        type: string
+        description: 'GitHub token or PAT for authentication'
+        required: true
 
     outputs:
       release_created: 
@@ -57,4 +61,5 @@ jobs:
           target-branch: ${{ inputs.target_branch }}
           config-file: ${{ inputs.config_file }}
           manifest-file: ${{ inputs.manifest_file }}
+          token: ${{ input.token }}
           skip-github-pull-request: false     # only create releases
