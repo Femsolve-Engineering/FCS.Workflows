@@ -1,0 +1,12 @@
+on:
+  push:
+    branches:
+      - main
+  
+name: release
+
+jobs:
+  release-build-push:
+    uses: Femsolve-Engineering/FCS.Workflows/.github/workflows/release.yml@main
+    with:
+      target_branch: main
