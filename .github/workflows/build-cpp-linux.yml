@@ -14,7 +14,7 @@ on:
         type: string
 
 jobs:
-  build:
+  build-and-archive:
     runs-on: ubuntu-latest
 
     steps:
