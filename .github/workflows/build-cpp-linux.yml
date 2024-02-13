@@ -1,0 +1,41 @@
+name: Build C++ Project - Linux
+
+on:
+  push:
+    branches: [ skip ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          submodules: 'recursive' # Fetch Git submodules
+
+      - name: Git LFS Pull
+        run: git lfs pull
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y software-properties-common
+          sudo add-apt-repository ppa:deadsnakes/ppa -y
+          sudo apt-get update
+          sudo apt-get install -y make gcc g++ wget unzip libgl1 libfreeimage-dev python3.11 python3.11-dev python3.11-venv libfreetype6-dev libfontconfig1-dev
+
+      - name: Unzip and rename shared directory
+        run: |
+          unzip ./3rdParty/Shared-Debian64.zip -d ./3rdParty/
+          mv ./3rdParty/GEOM.Vendor ./3rdParty/Shared
+
+      - name: Build
+        run: |
+          chmod +x ./BuildConfigs/LinuxBuild/LinuxBuild_RELEASE.sh
+          ./BuildConfigs/LinuxBuild/LinuxBuild_RELEASE.sh
+
+      - name: Archive binaries
+        uses: actions/upload-artifact@v2
+        with:
+          name: linux-x64-binaries
+          path: ./x64/Release/**
