@@ -26,7 +26,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update && sudo apt-get install -y software-properties-common
-          sudo apt-get install -y make gcc g++ wget unzip libgl1 libfreeimage-dev libfreetype6-dev libfontconfig1-dev
+          sudo apt-get install -y make gcc g++ wget zip unzip libgl1 libfreeimage-dev libfreetype6-dev libfontconfig1-dev
 
       - name: Unzip and rename shared directory
         run: |
@@ -37,9 +37,17 @@ jobs:
         run: |
           chmod +x ${{ input.shellScriptPath }}
           ${{ input.shellScriptPath }}
+          
+      - name: Zip the binaries
+        run: zip -r ubuntu-x64-binaries.zip ./x64/Release
 
-      - name: Archive binaries
-        uses: actions/upload-artifact@v2
+      - name: Attach binaries to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: linux-x64-binaries
-          path: ./x64/Release/**
+          token: ${{ secrets.GITHUB_TOKEN }}
+          upload_url: ${{ inputs.upload_url }}
+          asset_path: ./ubuntu-x64-binaries.zip
+          asset_name: ubuntu-x64-binaries.zip
+          asset_content_type: application/zip
