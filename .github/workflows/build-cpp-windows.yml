@@ -1,0 +1,32 @@
+name: Build C++ Project - Windows
+
+on:
+  workflow_call:
+    inputs:
+      releaseVersion:
+        required: true
+        type: string
+      solutionFileName:
+        required: true
+        type: string
+
+jobs:
+  build-and-archive:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up MSBuild path
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Git LFS Pull
+      run: git lfs pull
+
+    - name: Build solution
+      run: msbuild ${{ inputs.solutionFileName }}.sln /p:Configuration=Release /p:Platform="x64"
+      
+    - name: Archive binaries
+      uses: actions/upload-artifact@v2
+      with:
+        name: win-x64-binaries
+        path: ./x64/Release/**
