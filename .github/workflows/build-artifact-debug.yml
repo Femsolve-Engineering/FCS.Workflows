@@ -12,18 +12,16 @@ on:
       upload_url:
         required: true
         type: string
-      token:
-        required: true
-        type: string
 
 jobs:
   build-and-archive:
     runs-on: windows-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
     - uses: actions/checkout@v2
-
-    # Additional jobs...
-
+    
     - name: Generate Debug Text File
       run: |
         echo "This is a debug file for testing purposes" > debug.txt
@@ -34,8 +32,8 @@ jobs:
     - name: Attach binaries to release
       uses: actions/upload-release-asset@v1
       with:
+        token: ${{ secrets.GITHUB_TOKEN }}
         upload_url: ${{ inputs.upload_url }}
         asset_path: ./win-x64-binaries.zip
         asset_name: win-x64-binaries.zip
         asset_content_type: application/zip
-        token: ${{ inputs.token }}
