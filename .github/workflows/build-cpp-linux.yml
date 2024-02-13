@@ -36,10 +36,10 @@ jobs:
           unzip ./3rdParty/Shared-Debian64.zip -d ./3rdParty/
           mv ./3rdParty/GEOM.Vendor ./3rdParty/Shared
 
-      - name: Build
+      - name: Build # ToDo: Replace with shellScriptPath input
         run: |
-          chmod +x ${{ input.shellScriptPath }}
-          ${{ input.shellScriptPath }}
+          chmod +x ./BuildConfigs/LinuxBuild/LinuxBuild_RELEASE.sh 
+          ./BuildConfigs/LinuxBuild/LinuxBuild_RELEASE.sh
           
       - name: Zip the binaries
         run: zip -r ubuntu-x64-binaries.zip ./x64/Release
