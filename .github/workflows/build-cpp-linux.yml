@@ -1,8 +1,14 @@
 name: Build C++ Project - Linux
 
 on:
-  push:
-    branches: [ skip ]
+  workflow_call:
+    inputs:
+      releaseVersion:
+        required: true
+        type: string
+      shellScriptPath:
+        required: true
+        type: string
 
 jobs:
   build:
@@ -20,9 +26,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update && sudo apt-get install -y software-properties-common
-          sudo add-apt-repository ppa:deadsnakes/ppa -y
-          sudo apt-get update
-          sudo apt-get install -y make gcc g++ wget unzip libgl1 libfreeimage-dev python3.11 python3.11-dev python3.11-venv libfreetype6-dev libfontconfig1-dev
+          sudo apt-get install -y make gcc g++ wget unzip libgl1 libfreeimage-dev libfreetype6-dev libfontconfig1-dev
 
       - name: Unzip and rename shared directory
         run: |
@@ -31,8 +35,8 @@ jobs:
 
       - name: Build
         run: |
-          chmod +x ./BuildConfigs/LinuxBuild/LinuxBuild_RELEASE.sh
-          ./BuildConfigs/LinuxBuild/LinuxBuild_RELEASE.sh
+          chmod +x ${{ input.shellScriptPath }}
+          ${{ input.shellScriptPath }}
 
       - name: Archive binaries
         uses: actions/upload-artifact@v2
