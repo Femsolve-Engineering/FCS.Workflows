@@ -42,11 +42,13 @@ jobs:
         asset_name: headers.zip
         asset_content_type: application/zip
 
-    - name: Delete .exp and .pdb files with header files
+    - name: Delete .exp, .pdb, and header files
       run: |
-        Remove-Item -Path .\x64\Release\*.exp -Force
-        Remove-Item -Path .\x64\Release\*.pdb -Force
-        Remove-Item -Path .\x64\Release\include\* -Force
+        Remove-Item -Path .\x64\Release\*.exp -Force -ErrorAction SilentlyContinue
+        Remove-Item -Path .\x64\Release\*.pdb -Force -ErrorAction SilentlyContinue
+        if (Test-Path .\x64\Release\include\) {
+          Remove-Item -Path .\x64\Release\include\* -Force -ErrorAction SilentlyContinue
+        }
 
     - name: Zip the binaries
       run: Compress-Archive -Path .\x64\Release\* -DestinationPath .\windows-x64-binaries.zip
