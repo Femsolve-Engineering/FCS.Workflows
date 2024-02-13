@@ -12,6 +12,9 @@ on:
       upload_url:
         required: true
         type: string
+      token:
+        required: true
+        type: string
 
 jobs:
   build-and-archive:
