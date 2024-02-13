@@ -9,6 +9,9 @@ on:
       shellScriptPath:
         required: true
         type: string
+      upload_url:
+        required: true
+        type: string
 
 jobs:
   build:
