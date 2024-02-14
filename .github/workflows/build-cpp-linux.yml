@@ -40,6 +40,11 @@ jobs:
         run: |
           chmod +x ./BuildConfigs/LinuxBuild/LinuxBuild_RELEASE.sh 
           ./BuildConfigs/LinuxBuild/LinuxBuild_RELEASE.sh
+
+      - name: Copy over runtime required libraries # ToDo: Replace with shellScriptPath input
+        run: |
+          chmod +x ./BuildConfigs/debianPostBuild.sh 
+          ./BuildConfigs/debianPostBuild.sh
           
       - name: Zip the binaries
         run: zip -r ubuntu-x64-binaries.zip ./x64/Release
