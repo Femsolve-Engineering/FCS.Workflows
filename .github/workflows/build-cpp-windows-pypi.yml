@@ -19,33 +19,27 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up MSBuild path
-      uses: microsoft/setup-msbuild@v1.0.2
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '8' 
+        
+    - name: Build .NET Core Project
+      run: dotnet build PreRequisitesSetup/PreRequisitesSetup.csproj --configuration Release
+
+    - name: Run .NET Core Project
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: dotnet run --project PreRequisitesSetup/PreRequisitesSetup.csproj
 
     - name: Git LFS Pull
       run: git lfs pull
 
+    - name: Set up MSBuild path
+      uses: microsoft/setup-msbuild@v1.0.2
+
     - name: Build solution
       run: msbuild ${{ inputs.solutionFileName }}.sln /p:Configuration=Release /p:Platform="x64"
-
-    - name: Zip include headers
-      run: Compress-Archive -Path .\x64\Release\include\* -DestinationPath headers.zip
-
-    - name: Attach include headers to release
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        upload_url: ${{ inputs.upload_url }}
-        asset_path: ./headers.zip
-        asset_name: headers.zip
-        asset_content_type: application/zip
-
-    - name: Delete .exp, .pdb, and header files
-      run: |
-        Remove-Item -Path .\x64\Release\*.exp -Force -ErrorAction SilentlyContinue
-        Remove-Item -Path .\x64\Release\*.pdb -Force -ErrorAction SilentlyContinue
 
     - name: Zip the binaries
       run: Compress-Archive -Path .\x64\Release\* -DestinationPath .\windows-x64-binaries.zip
