@@ -1,0 +1,50 @@
+name: Build C++ Project for PyPi - Linux
+
+on:
+  workflow_call:
+    inputs:
+      releaseVersion:
+        required: true
+        type: string
+      shellScriptPath:
+        required: true
+        type: string
+      upload_url:
+        required: true
+        type: string
+
+jobs:
+  build-and-archive:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          submodules: 'recursive' # Fetch Git submodules
+
+      - name: Git LFS Pull
+        run: git lfs pull
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y software-properties-common
+          sudo apt-get install -y make gcc g++ wget python3.11 python3.11-dev python3.11-venv zip unzip libgl1 libfreeimage-dev libfreetype6-dev libfontconfig1-dev
+
+      - name: Unzip and rename shared directory
+        run: |
+          unzip ./3rdParty/Shared-Debian64.zip -d ./3rdParty/
+          mv ./3rdParty/GEOM.Vendor ./3rdParty/Shared
+
+      - name: Build # ToDo: Replace with shellScriptPath input
+        run: |
+          chmod +x ./BuildConfigs/LinuxBuild/LinuxBuild_RELEASE.sh 
+          ./BuildConfigs/LinuxBuild/LinuxBuild_RELEASE.sh
+
+      - name: Copy over runtime required libraries # ToDo: Replace with shellScriptPath input
+        run: |
+          chmod +x ./BuildConfigs/debianPostBuild.sh 
+          ./BuildConfigs/debianPostBuild.sh
+          
+      - name: Zip the binaries
+        run: zip -r ubuntu-x64-binaries.zip ./x64/Release
