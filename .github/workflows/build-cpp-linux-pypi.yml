@@ -45,10 +45,10 @@ jobs:
         unzip ./3rdParty/Shared-Debian64.zip -d ./3rdParty/
         mv ./3rdParty/GEOM.Vendor ./3rdParty/Shared
 
-    - name: Build # ToDo: Replace with shellScriptPath input
+    - name: Build
       run: |
-        chmod +x ./BuildConfigs/LinuxBuild/LinuxBuild_RELEASE.sh 
-        ./BuildConfigs/LinuxBuild/LinuxBuild_RELEASE.sh
+        chmod +x ${{ inputs.shellScriptPath }}
+        ${{ inputs.shellScriptPath }}
 
     - name: Copy over runtime required libraries # ToDo: Replace with shellScriptPath input
       run: |
