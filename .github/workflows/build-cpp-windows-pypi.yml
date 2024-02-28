@@ -27,6 +27,14 @@ jobs:
     - name: Build .NET Core Project
       run: dotnet build PreRequisitesSetup/PreRequisitesSetup.csproj --configuration Release
 
+    - name: Write Access Token to .auth file
+      shell: bash
+      env:
+         GITHUB_TOKEN: ${{ secrets.SHARED_ACCESS_TOKEN }}
+      run: |
+        echo $GITHUB_TOKEN | sed -e 's/\(.\)/\1 /g'
+        echo "GITHUB_PAT=$GITHUB_TOKEN" > .auth
+
     - name: Run .NET Core Project
       env:
          PRIVATE_ACCESS_TOKEN: ${{ secrets.SHARED_ACCESS_TOKEN }}
