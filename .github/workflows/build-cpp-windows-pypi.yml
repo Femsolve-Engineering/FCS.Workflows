@@ -30,7 +30,9 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-    - run: python -c "import sysconfig; print(sysconfig.get_path('include'))"
+    - run: |
+        python -c "import sysconfig; print(sysconfig.get_path('include'))"
+        python -c "import sysconfig; print(sysconfig.get_config_var('LIBDIR'))"
 
     - name: Build .NET Core Project
       run: dotnet build PreRequisitesSetup/PreRequisitesSetup.csproj --configuration Release
