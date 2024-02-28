@@ -29,7 +29,7 @@ jobs:
 
     - name: Run .NET Core Project
       env:
-         PRIVATE_ACCESS_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+         PRIVATE_ACCESS_TOKEN: ${{ secrets.SHARED_ACCESS_TOKEN }}
       run: dotnet run --project PreRequisitesSetup/PreRequisitesSetup.csproj
 
     - name: Git LFS Pull
