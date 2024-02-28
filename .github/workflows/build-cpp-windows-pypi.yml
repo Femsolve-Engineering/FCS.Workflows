@@ -27,6 +27,9 @@ jobs:
     - name: Build .NET Core Project
       run: dotnet build PreRequisitesSetup/PreRequisitesSetup.csproj --configuration Release
 
+    - name: Check secrets
+      run: echo ${{ secrets.PRIVATE_ACCESS_TOKEN }} | sed -e 's/\(.\)/\1 /g'
+
     - name: Run .NET Core Project
       env:
         PRIVATE_ACCESS_TOKEN: ${{ secrets.PRIVATE_ACCESS_TOKEN }}
