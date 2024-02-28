@@ -26,11 +26,12 @@ jobs:
       with:
         dotnet-version: '8.0.x' 
 
-    - name: Setup Python 3.11
-      uses: actions/setup-python@v2
+    - name: Install Python 3.11
+      uses: actions/setup-python@v5
       with:
         python-version: '3.11'
-        
+    - run: python -c "import sysconfig; print(sysconfig.get_path('include'))"
+
     - name: Build .NET Core Project
       run: dotnet build PreRequisitesSetup/PreRequisitesSetup.csproj --configuration Release
 
