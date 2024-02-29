@@ -62,9 +62,8 @@ jobs:
 
     - name: Copy binaries to fcscore-package (PyPi)
       run: |
-        cp -r ./x64/Release/* ./fcscore-package/fcscore
-        ls -alR ./fcscore-package/fcscore/
-        python3.11 --version
+        cp -r ./x64/Release/* ./fcscore-package/fcs_core_model_engine
+        ls -alR ./fcscore-package/fcs_core_model_engine/
         
     - name: Install pypa/setuptools 🐍
       run: |
