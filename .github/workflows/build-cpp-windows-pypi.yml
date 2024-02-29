@@ -68,6 +68,8 @@ jobs:
         python ./fcscore-package/setup.py bdist_wheel --plat-name win_amd64
         python -m twine upload ./fcscore-package/dist/*
     - name: Publish distribution 📦 to PyPI
-      uses: pypa/gh-action-pypi-publish@master
-      with:
-        password: ${{ secrets.INHERITED_PYPI_TOKEN }}
+      run: |
+        python -m twine upload ./fcscore-package/dist/*
+      env:
+        TWINE_USERNAME: __token__
+        TWINE_PASSWORD: ${{ secrets.INHERITED_PYPI_TOKEN  }}
