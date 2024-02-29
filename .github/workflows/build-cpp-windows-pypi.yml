@@ -70,12 +70,13 @@ jobs:
 
     - name: Build a binary wheel
       run: |
-        python ./fcscore-package/setup.py bdist_wheel --plat-name win_amd64
-        python -m twine upload ./fcscore-package/dist/*
+        cd ./fcscore-package
+        python setup.py bdist_wheel --plat-name win_amd64
     
     - name: Publish distribution 📦 to PyPI
       run: |
-        python -m twine upload ./fcscore-package/dist/*
+        cd ./fcscore-package
+        python -m twine upload dist/*
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.INHERITED_PYPI_TOKEN  }}
