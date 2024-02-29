@@ -18,7 +18,7 @@ on:
         
 jobs:
   build-and-publish:
-    runs-on: ubuntu-20.04 # Not using latest due to GLIBC error
+    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
       with: 
