@@ -51,16 +51,23 @@ jobs:
     - name: Build solution
       run: msbuild ${{ inputs.solutionFileName }}.sln /p:Configuration=Release /p:Platform="x64"
 
-    - name: Zip the binaries
-      run: Compress-Archive -Path .\x64\Release\* -DestinationPath .\windows-x64-binaries.zip
-
-    - name: Attach binaries to release
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.INHERITED_ACCESS_TOKEN }}
+    - name: Copy binaries to fcscore-package (PyPi)
+      run: |
+        New-Item -Path "./fcscore-package/fcscore/" -ItemType Directory -Force
+        Copy-Item -Path "./x64/Release/*" -Destination "./fcscore-package/fcscore/" -Recurse -Force
+     
+    - name: Install pypa/setuptools 🐍
+      run: >-
+        python -m
+        pip install wheel twine
+    - name: Update version in setup.py
+      run: >-
+        sed -i "s/{{VERSION_PLACEHOLDER}}/${{ inputs.releaseVersion }}/g" ./fcscore-package/setup.py
+    - name: Build a binary wheel
+      run: |
+        python ./fcscore-package/setup.py bdist_wheel --plat-name win_amd64
+        python -m twine upload ./fcscore-package/dist/*
+    - name: Publish distribution 📦 to PyPI
+      uses: pypa/gh-action-pypi-publish@master
       with:
-        token: ${{ secrets.INHERITED_ACCESS_TOKEN }}
-        upload_url: ${{ inputs.upload_url }}
-        asset_path: ./windows-x64-binaries.zip
-        asset_name: windows-x64-binaries.zip
-        asset_content_type: application/zip
+        password: ${{ secrets.INHERITED_PYPI_TOKEN }}
