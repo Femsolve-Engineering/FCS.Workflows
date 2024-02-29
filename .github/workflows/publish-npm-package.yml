@@ -1,0 +1,38 @@
+name: Publish NPM Package
+
+on:
+  workflow_call:
+    inputs:
+      releaseVersion:
+        required: true
+        type: string
+      typesOutputFolder:
+        required: true
+        type: string
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          registry-url: https://registry.npmjs.org/
+
+      - name: Install pre-requisites
+        run: npm install
+
+      - name: Build viewer bundle and extract declaration files
+        run: npm run build
+
+      - name: Copy over template package.json file and set version
+        run: |
+        
+
+      - name: Publish declaration files
+        run: |
+          cd {{ inputs.typesOutputFolder }}
+          npm publish
+        env:
+          NPM_TOKEN: ${{secrets.NPM_TOKEN}}
