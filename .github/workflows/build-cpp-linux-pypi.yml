@@ -83,7 +83,7 @@ jobs:
     - name: Publish distribution 📦 to PyPI
       run: |
         cd ./fcscore-package
-        python -m twine upload dist/*
+        # python3.11 -m twine upload dist/*
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.INHERITED_PYPI_TOKEN  }}
