@@ -64,7 +64,7 @@ jobs:
       run: |
         cp -r ./x64/Release/* ./fcscore-package/fcscore
         ls -alR ./fcscore-package/fcscore/
-        python --version
+        python3.11 --version
         
     - name: Install pypa/setuptools 🐍
       run: >-
