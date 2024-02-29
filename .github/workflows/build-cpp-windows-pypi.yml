@@ -53,11 +53,10 @@ jobs:
 
     - name: Copy binaries to fcscore-package (PyPi)
       run: |
-        New-Item -Path "./fcscore-package/fcscore/" -ItemType Directory -Force
-        Copy-Item -Path "./x64/Release/*" -Destination "./fcscore-package/fcscore/" -Recurse -Force
+        Copy-Item -Path "./x64/Release/*" -Destination "./fcscore-package/fcs_core_model_engine/" -Recurse -Force
      
     - name: Install pypa/setuptools 🐍
-      run: >-
+      run: |
         python -m
         pip install wheel twine
         
