@@ -43,7 +43,7 @@ jobs:
 
       - name: Publish declaration files
         run: |
-          echo ${{ secrets.NPM_TOKEN }}
+          echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > .npmrc
           npm publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
