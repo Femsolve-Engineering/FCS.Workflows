@@ -6,7 +6,7 @@ on:
       releaseVersion:
         required: true
         type: string
-      typesOutputFolder:
+      upload_url:
         required: true
         type: string
 
@@ -26,13 +26,23 @@ jobs:
       - name: Build viewer bundle and extract declaration files
         run: npm run build
 
-      - name: Copy over template package.json file and set version
+      - name: Zip viewer bundle assets
         run: |
-        
+          zip -r fcs-core-viewer.zip ./fcs-core-viewer
+
+      - name: Attach bundle to release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          upload_url: ${{ inputs.upload_url }}
+          asset_path: ./fcs-core-viewer.zip
+          asset_name: fcs-core-viewer.zip
+          asset_content_type: application/zip
 
       - name: Publish declaration files
         run: |
-          cd {{ inputs.typesOutputFolder }}
           npm publish
         env:
           NPM_TOKEN: ${{secrets.NPM_TOKEN}}
