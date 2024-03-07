@@ -9,9 +9,6 @@ on:
       solutionFileName:
         required: true
         type: string
-      upload_url:
-        required: true
-        type: string
 
 jobs:
   build-and-archive:
@@ -22,41 +19,24 @@ jobs:
     - name: Set up MSBuild path
       uses: microsoft/setup-msbuild@v1.0.2
 
-    - name: Git LFS Pull
-      run: git lfs pull
+    - name: Build .NET Core Project
+      run: dotnet build PreRequisitesSetup/PreRequisitesSetup.csproj --configuration Release
 
-    - name: Build solution
-      run: msbuild ${{ inputs.solutionFileName }}.sln /p:Configuration=Release /p:Platform="x64"
-
-    - name: Zip include headers
-      run: Compress-Archive -Path .\x64\Release\include\* -DestinationPath headers.zip
-
-    - name: Attach include headers to release
-      uses: actions/upload-release-asset@v1
+    - name: Run .NET Core Project - Download latest Viewer assets
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        upload_url: ${{ inputs.upload_url }}
-        asset_path: ./headers.zip
-        asset_name: headers.zip
-        asset_content_type: application/zip
+         PRIVATE_ACCESS_TOKEN: ${{ secrets.INHERITED_ACCESS_TOKEN }}
+      run: dotnet run --project PreRequisitesSetup/PreRequisitesSetup.csproj
 
-    - name: Delete .exp, .pdb, and header files
+    - name: Log in to Azure Container Registry
+      uses: azure/docker-login@v1
+      with:
+        login-server: femsolvecloudservicesregistry.azurecr.io
+        username: ${{ secrets.ACR_USERNAME }}
+        password: ${{ secrets.ACR_PASSWORD }}
+
+    - name: Build and Push Docker Image
       run: |
-        Remove-Item -Path .\x64\Release\*.exp -Force -ErrorAction SilentlyContinue
-        Remove-Item -Path .\x64\Release\*.pdb -Force -ErrorAction SilentlyContinue
-
-    - name: Zip the binaries
-      run: Compress-Archive -Path .\x64\Release\* -DestinationPath .\windows-x64-binaries.zip
-
-    - name: Attach binaries to release
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        upload_url: ${{ inputs.upload_url }}
-        asset_path: ./windows-x64-binaries.zip
-        asset_name: windows-x64-binaries.zip
-        asset_content_type: application/zip
+        docker build -t femsolvecloudservicesregistry.azurecr.io/fcs-model-service:${{ inputs.releaseVersion }} .
+        docker push femsolvecloudservicesregistry.azurecr.io/fcs-model-service:${{ inputs.releaseVersion }}
+        docker tag femsolvecloudservicesregistry.azurecr.io/fcs-model-service:${{ inputs.releaseVersion }} femsolvecloudservicesregistry.azurecr.io/fcs-model-service:latest
+        docker push femsolvecloudservicesregistry.azurecr.io/fcs-model-service:latest
