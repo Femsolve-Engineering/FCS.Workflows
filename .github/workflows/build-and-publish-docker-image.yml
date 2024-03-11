@@ -36,7 +36,13 @@ jobs:
 
     - name: Build and Push Docker Image
       run: |
+        echo "Building Docker image with tag ${{ inputs.releaseVersion }}"
         docker build -t modelservicecontainersregistry.azurecr.io/fcs-model-service:${{ inputs.releaseVersion }} .
+        echo "Listing Docker images to verify build"
+        docker images
+        echo "Pushing Docker image with tag ${{ inputs.releaseVersion }}"
         docker push modelservicecontainersregistry.azurecr.io/fcs-model-service:${{ inputs.releaseVersion }}
+        echo "Tagging Docker image as latest"
         docker tag modelservicecontainersregistry.azurecr.io/fcs-model-service:${{ inputs.releaseVersion }} modelservicecontainersregistry.azurecr.io/fcs-model-service:latest
+        echo "Pushing Docker image with tag latest"
         docker push modelservicecontainersregistry.azurecr.io/fcs-model-service:latest
