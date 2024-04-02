@@ -33,6 +33,14 @@ jobs:
     - name: Restore NuGet packages
       run: dotnet restore ${{ inputs.solutionFileName }}.sln
 
+    - name: Build .NET Core Project
+      run: dotnet build BuildConfigs/PreRequisitesSetup/PreRequisitesSetup.csproj --configuration Release
+
+    - name: Run .NET Core Project
+      env:
+        PRIVATE_ACCESS_TOKEN: ${{ secrets.INHERITED_ACCESS_TOKEN }}
+      run: dotnet run --project BuildConfigs/PreRequisitesSetup/PreRequisitesSetup.csproj
+
     - name: Build solution
       run: msbuild ${{ inputs.solutionFileName }}.sln /p:Configuration=Release /p:Platform="x64"
 
