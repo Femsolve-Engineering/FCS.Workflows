@@ -43,7 +43,7 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update && sudo apt-get install -y software-properties-common
-        sudo apt-get install -y make gcc g++ wget python3.11 python3.11-dev python3.11-venv zip unzip libgl1 libglu1-mesa-dev libfreeimage-dev libfreetype6-dev libfontconfig1-dev
+        sudo apt-get install -y make gcc g++ wget python3.11 python3.11-dev python3.11-venv zip unzip libgl1 libfreeimage-dev libfreetype6-dev libfontconfig1-dev
 
     - name: Unzip and rename shared directory
       run: |
