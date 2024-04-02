@@ -36,6 +36,19 @@ jobs:
           unzip ./3rdParty/Shared-Debian64.zip -d ./3rdParty/
           mv ./3rdParty/GEOM.Vendor ./3rdParty/Shared
 
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: '7.0.x' 
+          
+      - name: Build .NET Core Project
+        run: dotnet build BuildConfigs/PreRequisitesSetup/PreRequisitesSetup.csproj --configuration Release
+  
+      - name: Run .NET Core Project
+        env:
+          PRIVATE_ACCESS_TOKEN: ${{ secrets.INHERITED_ACCESS_TOKEN }}
+        run: dotnet run --project BuildConfigs/PreRequisitesSetup/PreRequisitesSetup.csproj
+
       - name: Build # ToDo: Replace with shellScriptPath input
         run: |
           chmod +x ./BuildConfigs/LinuxBuild/LinuxBuild_RELEASE.sh 
