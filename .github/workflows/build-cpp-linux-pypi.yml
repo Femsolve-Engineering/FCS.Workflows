@@ -43,7 +43,18 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update && sudo apt-get install -y software-properties-common
-        sudo apt-get install -y make gcc g++ wget python3.11 python3.11-dev python3.11-venv zip unzip libgl1 libfreeimage-dev libfreetype6-dev libfontconfig1-dev
+        sudo apt-get install -y make gcc g++ wget zip unzip libgl1 libfreeimage-dev libfreetype6-dev libfontconfig1-dev
+
+    - name: Check Available Python Versions
+      run: apt list python3.*
+
+    - name: Install Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Verify Python Installation
+      run: python3 --version
 
     - name: Unzip and rename shared directory
       run: |
@@ -65,9 +76,10 @@ jobs:
         cp -r ./x64/Release/* ./fcscore-package/fcs_core_model_engine
         ls -alR ./fcscore-package/fcs_core_model_engine/
         
-    - name: Install pypa/setuptools 🐍
+    - name: Install Python Packages
       run: |
-        python3.11 -m pip install wheel twine
+        python3 -m pip install --upgrade pip
+        python3 -m pip install wheel twine
         
     - name: Update version in setup.py
       run: |
@@ -77,12 +89,12 @@ jobs:
     - name: Build binary wheel
       run: |
         cd ./fcscore-package
-        python3.11 setup.py bdist_wheel --plat-name manylinux_2_24_x86_64
+        python3 setup.py bdist_wheel --plat-name manylinux_2_24_x86_64
         
     - name: Publish distribution 📦 to PyPI
       run: |
         cd ./fcscore-package
-        python3.11 -m twine upload dist/*
+        python3 -m twine upload dist/*
       env:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.INHERITED_PYPI_TOKEN  }}
