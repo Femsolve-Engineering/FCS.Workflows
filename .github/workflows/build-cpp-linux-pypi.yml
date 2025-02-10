@@ -18,7 +18,7 @@ on:
         
 jobs:
   build-and-publish:
-    runs-on: ubuntu:22.04 # GLIBC compatibility
+    runs-on: ubuntu-22.04 # GLIBC compatibility
     steps:
     - uses: actions/checkout@v2
       with: 
