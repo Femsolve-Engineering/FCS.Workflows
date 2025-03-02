@@ -24,11 +24,11 @@ jobs:
         run: npm install
 
       - name: Build viewer bundle and extract declaration files
-        run: npm run build:dev # ToDo: Remove :dev in the future
+        run: npm run build:edev # ToDo: Remove :dev in the future
 
       - name: Zip viewer bundle assets
         run: |
-          zip -r fcs-core-viewer.zip ./fcs-core-viewer
+          zip -r fcs-core-editor.zip ./fcs-core-editor
 
       - name: Attach bundle to release
         uses: actions/upload-release-asset@v1
@@ -37,8 +37,8 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           upload_url: ${{ inputs.upload_url }}
-          asset_path: ./fcs-core-viewer.zip
-          asset_name: fcs-core-viewer.zip
+          asset_path: ./fcs-core-editor.zip
+          asset_name: fcs-core-editor.zip
           asset_content_type: application/zip
 
       - name: Publish declaration files
