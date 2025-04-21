@@ -15,7 +15,7 @@ on:
 
 jobs:
   build-and-archive:
-    runs-on: ubuntu-20.04 # GLIBC compatibility with python-3.11-bullseye image
+    runs-on: ubuntu-22.04 # GLIBC compatibility with python-3.11-bullseye image
 
     steps:
       - name: Checkout code
