@@ -31,7 +31,7 @@ jobs:
 
     - name: Log in to Fly.io Registry
       run: |
-        echo "${{ secrets.FLY_API_TOKEN }}" | docker login registry.fly.io -u x --password-stdin
+        echo "${{ secrets.INHERITED_FLY_API_TOKEN }}" | docker login registry.fly.io -u x --password-stdin
 
     - name: Build and Push Docker Image to Fly.io
       run: |
