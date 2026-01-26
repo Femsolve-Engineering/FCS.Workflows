@@ -14,7 +14,7 @@ on:
         type: string
 
 jobs:
-  build-and-deploy-flyio:
+  build-and-push-image-to-flyio:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -48,12 +48,3 @@ jobs:
         docker tag registry.fly.io/${{ inputs.flyAppName }}:${{ inputs.releaseVersion }} registry.fly.io/${{ inputs.flyAppName }}:latest
         echo "Pushing Docker image with tag latest"
         docker push registry.fly.io/${{ inputs.flyAppName }}:latest
-
-    - name: Deploy to Fly.io
-      run: |
-        curl -L https://fly.io/install.sh | sh
-        export FLYCTL_INSTALL="/home/runner/.fly"
-        export PATH="$FLYCTL_INSTALL/bin:$PATH"
-        flyctl deploy --image registry.fly.io/${{ inputs.flyAppName }}:${{ inputs.releaseVersion }} --app ${{ inputs.flyAppName }}
-      env:
-        FLY_API_TOKEN: ${{ secrets.INHERITED_FLY_API_TOKEN }}
