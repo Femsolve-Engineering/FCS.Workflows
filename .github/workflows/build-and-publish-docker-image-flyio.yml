@@ -1,0 +1,56 @@
+name: Publish Docker Image to Fly.io
+
+on:
+  workflow_call:
+    inputs:
+      releaseVersion:
+        required: true
+        type: string
+      solutionFileName:
+        required: true
+        type: string
+
+jobs:
+  build-and-deploy-flyio:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '7.0.x' 
+
+    - name: Build .NET Core Project
+      run: dotnet build PreRequisitesSetup/PreRequisitesSetup.csproj --configuration Release
+
+    - name: Run .NET Core Project - Download latest Viewer assets
+      env:
+         PRIVATE_ACCESS_TOKEN: ${{ secrets.INHERITED_ACCESS_TOKEN }}
+      run: dotnet run --project PreRequisitesSetup/PreRequisitesSetup.csproj
+
+    - name: Log in to Fly.io Registry
+      run: |
+        echo "${{ secrets.FLY_API_TOKEN }}" | docker login registry.fly.io -u x --password-stdin
+
+    - name: Build and Push Docker Image to Fly.io
+      run: |
+        echo "Building Docker image with tag ${{ inputs.releaseVersion }}"
+        docker build -t registry.fly.io/${{ secrets.FLY_APP_NAME }}:${{ inputs.releaseVersion }} .
+        echo "Listing Docker images to verify build"
+        docker images
+        echo "Pushing Docker image with tag ${{ inputs.releaseVersion }}"
+        docker push registry.fly.io/${{ secrets.FLY_APP_NAME }}:${{ inputs.releaseVersion }}
+        echo "Tagging Docker image as latest"
+        docker tag registry.fly.io/${{ secrets.FLY_APP_NAME }}:${{ inputs.releaseVersion }} registry.fly.io/${{ secrets.FLY_APP_NAME }}:latest
+        echo "Pushing Docker image with tag latest"
+        docker push registry.fly.io/${{ secrets.FLY_APP_NAME }}:latest
+
+    - name: Deploy to Fly.io
+      run: |
+        curl -L https://fly.io/install.sh | sh
+        export FLYCTL_INSTALL="/home/runner/.fly"
+        export PATH="$FLYCTL_INSTALL/bin:$PATH"
+        flyctl deploy --image registry.fly.io/${{ secrets.FLY_APP_NAME }}:${{ inputs.releaseVersion }} --app ${{ secrets.FLY_APP_NAME }}
+      env:
+        FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
