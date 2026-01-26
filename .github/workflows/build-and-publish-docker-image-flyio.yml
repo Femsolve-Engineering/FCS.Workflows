@@ -9,6 +9,9 @@ on:
       solutionFileName:
         required: true
         type: string
+      flyAppName:
+        required: true
+        type: string
 
 jobs:
   build-and-deploy-flyio:
@@ -36,21 +39,21 @@ jobs:
     - name: Build and Push Docker Image to Fly.io
       run: |
         echo "Building Docker image with tag ${{ inputs.releaseVersion }}"
-        docker build -t registry.fly.io/${{ secrets.FLY_APP_NAME }}:${{ inputs.releaseVersion }} .
+        docker build -t registry.fly.io/${{ inputs.flyAppName }}:${{ inputs.releaseVersion }} .
         echo "Listing Docker images to verify build"
         docker images
         echo "Pushing Docker image with tag ${{ inputs.releaseVersion }}"
-        docker push registry.fly.io/${{ secrets.FLY_APP_NAME }}:${{ inputs.releaseVersion }}
+        docker push registry.fly.io/${{ inputs.flyAppName }}:${{ inputs.releaseVersion }}
         echo "Tagging Docker image as latest"
-        docker tag registry.fly.io/${{ secrets.FLY_APP_NAME }}:${{ inputs.releaseVersion }} registry.fly.io/${{ secrets.FLY_APP_NAME }}:latest
+        docker tag registry.fly.io/${{ inputs.flyAppName }}:${{ inputs.releaseVersion }} registry.fly.io/${{ inputs.flyAppName }}:latest
         echo "Pushing Docker image with tag latest"
-        docker push registry.fly.io/${{ secrets.FLY_APP_NAME }}:latest
+        docker push registry.fly.io/${{ inputs.flyAppName }}:latest
 
     - name: Deploy to Fly.io
       run: |
         curl -L https://fly.io/install.sh | sh
         export FLYCTL_INSTALL="/home/runner/.fly"
         export PATH="$FLYCTL_INSTALL/bin:$PATH"
-        flyctl deploy --image registry.fly.io/${{ secrets.FLY_APP_NAME }}:${{ inputs.releaseVersion }} --app ${{ secrets.FLY_APP_NAME }}
+        flyctl deploy --image registry.fly.io/${{ inputs.flyAppName }}:${{ inputs.releaseVersion }} --app ${{ inputs.flyAppName }}
       env:
         FLY_API_TOKEN: ${{ secrets.INHERITED_FLY_API_TOKEN }}
