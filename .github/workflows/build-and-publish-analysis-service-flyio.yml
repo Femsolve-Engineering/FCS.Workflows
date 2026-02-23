@@ -22,7 +22,10 @@ jobs:
   build-and-push-image-to-flyio:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Log in to Fly.io Registry
       # fly registry auth is via the Fly API token
