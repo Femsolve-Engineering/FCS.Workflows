@@ -24,7 +24,7 @@ jobs:
         run: npm install
 
       - name: Build viewer bundle and extract declaration files
-        run: npm run build:edev # ToDo: Remove :dev in the future
+        run: npm run build:eprod
 
       - name: Zip viewer bundle assets
         run: |
