@@ -6,9 +6,6 @@ on:
       releaseVersion:
         required: true
         type: string
-      upload_url:
-        required: true
-        type: string
 
 jobs:
   build-and-publish:
@@ -31,15 +28,10 @@ jobs:
           zip -r fcs-core-editor.zip ./fcs-core-editor
 
       - name: Attach bundle to release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: softprops/action-gh-release@v2
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          upload_url: ${{ inputs.upload_url }}
-          asset_path: ./fcs-core-editor.zip
-          asset_name: fcs-core-editor.zip
-          asset_content_type: application/zip
+          tag_name: ${{ inputs.releaseVersion }}
+          files: ./fcs-core-editor.zip
 
       - name: Publish declaration files
         run: |
