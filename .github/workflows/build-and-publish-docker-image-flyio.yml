@@ -27,9 +27,10 @@ jobs:
     - name: Build .NET Core Project
       run: dotnet build PreRequisitesSetup/PreRequisitesSetup.csproj --configuration Release
 
-    - name: Run .NET Core Project - Download latest Viewer assets
+    - name: Prepare runtime prerequisites and download release assets
       env:
          PRIVATE_ACCESS_TOKEN: ${{ secrets.INHERITED_ACCESS_TOKEN }}
+         ENGINE_RELEASE_TOKEN: ${{ secrets.INHERITED_ENGINE_ACCESS_TOKEN }}
       run: dotnet run --project PreRequisitesSetup/PreRequisitesSetup.csproj
 
     - name: Log in to Fly.io Registry
